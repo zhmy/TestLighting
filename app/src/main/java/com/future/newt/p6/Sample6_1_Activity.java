@@ -1,23 +1,50 @@
 package com.future.newt.p6;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+
+import com.future.newt.R;
 
 public class Sample6_1_Activity extends Activity {
-	private MySurfaceView mGLSurfaceView;
+    private MySurfaceView mGLSurfaceView;
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// ����Ϊȫ��
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		// ��ʼ��GLSurfaceView
-		mGLSurfaceView = new MySurfaceView(this);
-		// �л���������
-		setContentView(mGLSurfaceView);	
-	}
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // ����Ϊȫ��
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);//����Ϊ����
+        // ��ʼ��GLSurfaceView
+        mGLSurfaceView = new MySurfaceView(this);
+        // �л���������
+        setContentView(R.layout.main);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.main_liner);
+        ll.addView(mGLSurfaceView);
+        //��ͨ�������������Ĵ������
+        SeekBar sb = (SeekBar) this.findViewById(R.id.SeekBar01);
+        sb.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress,
+                                                  boolean fromUser) {
+                        mGLSurfaceView.setLightOffset((seekBar.getMax() / 2.0f - progress) / (seekBar.getMax() / 2.0f) * -4);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                }
+        );
+    }
 
     @Override
     protected void onResume() {
@@ -28,6 +55,6 @@ public class Sample6_1_Activity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        mGLSurfaceView.onPause(); 
-    } 
+        mGLSurfaceView.onPause();
+    }
 }

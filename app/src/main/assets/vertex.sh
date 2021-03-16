@@ -1,14 +1,31 @@
 #version 300 es
-uniform mat4 uMVPMatrix; //ï¿½Ü±ä»»ï¿½ï¿½ï¿½ï¿½
-in vec3 aPosition;  //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
-out vec3 vPosition;//ï¿½ï¿½ï¿½Ú´ï¿½ï¿½İ¸ï¿½Æ¬Ôªï¿½ï¿½É«ï¿½ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½Î»ï¿½ï¿½
-out vec4 vAmbient;//ï¿½ï¿½ï¿½Ú´ï¿½ï¿½İ¸ï¿½Æ¬Ôªï¿½ï¿½É«ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-void main()     
-{         
-   //ï¿½ï¿½ï¿½ï¿½ï¿½Ü±ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë´Î»ï¿½ï¿½Æ´Ë¶ï¿½ï¿½ï¿½Î»ï¿½ï¿½         		
-   gl_Position = uMVPMatrix * vec4(aPosition,1); 
-   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã´ï¿½ï¿½ï¿½Æ¬Ôªï¿½ï¿½É«ï¿½ï¿½
-   vPosition = aPosition;   
-//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½È´ï¿½ï¿½ï¿½Æ¬Ôªï¿½ï¿½É«ï¿½ï¿½
-   vAmbient = vec4(0.15,0.15,0.15,1.0);
-}                      
+uniform mat4 uMVPMatrix; 						//×Ü±ä»»¾ØÕó
+uniform mat4 uMMatrix; 							//±ä»»¾ØÕó(°üÀ¨Æ½ÒÆ¡¢Ğı×ª¡¢Ëõ·Å)
+uniform vec3 uLightLocation;						//¹âÔ´Î»ÖÃ
+in vec3 aPosition;  						//¶¥µãÎ»ÖÃ
+in vec3 aNormal;    						//¶¥µã·¨ÏòÁ¿
+out vec3 vPosition;							//ÓÃÓÚ´«µİ¸øÆ¬Ôª×ÅÉ«Æ÷µÄ¶¥µãÎ»ÖÃ
+out vec4 vDiffuse;							//ÓÃÓÚ´«µİ¸øÆ¬Ôª×ÅÉ«Æ÷µÄÉ¢Éä¹â·ÖÁ¿
+void pointLight (								//É¢Éä¹â¹âÕÕ¼ÆËãµÄ·½·¨
+  in vec3 normal,								//·¨ÏòÁ¿
+  inout vec4 diffuse,								//É¢Éä¹â¼ÆËã½á¹û
+  in vec3 lightLocation,							//¹âÔ´Î»ÖÃ
+  in vec4 lightDiffuse							//É¢Éä¹âÇ¿¶È
+){  
+  vec3 normalTarget=aPosition+normal;					//¼ÆËã±ä»»ºóµÄ·¨ÏòÁ¿
+  vec3 newNormal=(uMMatrix*vec4(normalTarget,1)).xyz-(uMMatrix*vec4(aPosition,1)).xyz;
+  newNormal=normalize(newNormal);					//¶Ô·¨ÏòÁ¿¹æ¸ñ»¯
+//¼ÆËã´Ó±íÃæµãµ½¹âÔ´Î»ÖÃµÄÏòÁ¿vp
+  vec3 vp= normalize(lightLocation-(uMMatrix*vec4(aPosition,1)).xyz);
+  vp=normalize(vp);									//¹æ¸ñ»¯vp
+  float nDotViewPosition=max(0.0,dot(newNormal,vp)); 	//Çó·¨ÏòÁ¿ÓëvpÏòÁ¿µÄµã»ıÓë0µÄ×î´óÖµ
+  diffuse=lightDiffuse*nDotViewPosition;			//¼ÆËãÉ¢Éä¹âµÄ×îÖÕÇ¿¶È
+}
+void main(){
+   gl_Position = uMVPMatrix * vec4(aPosition,1); 	//¸ù¾İ×Ü±ä»»¾ØÕó¼ÆËã´Ë´Î»æÖÆ´Ë¶¥µãµÄÎ»ÖÃ 
+   vec4 diffuseTemp=vec4(0.0,0.0,0.0,0.0);   
+   pointLight(normalize(aNormal), diffuseTemp, uLightLocation, vec4(0.8,0.8,0.8,1.0));  
+   vDiffuse=diffuseTemp;					//½«É¢Éä¹â×îÖÕÇ¿¶È´«¸øÆ¬Ôª×ÅÉ«Æ÷
+   vPosition = aPosition; 					//½«¶¥µãµÄÎ»ÖÃ´«¸øÆ¬Ôª×ÅÉ«Æ÷
+}
+

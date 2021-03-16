@@ -3,13 +3,11 @@ package com.future.newt.p6;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.opengl.GLES30;
 import android.util.Log;
 
 //���ض���Shader��ƬԪShader�Ĺ�����
-@SuppressLint("NewApi")
 public class ShaderUtil 
 {
    //�����ƶ�shader�ķ���

@@ -7,7 +7,6 @@ import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
-@SuppressLint("ClickableViewAccessibility")
 class MySurfaceView extends GLSurfaceView 
 {
 	private final float TOUCH_SCALE_FACTOR = 180.0f/320;//�Ƕ����ű���
@@ -16,6 +15,7 @@ class MySurfaceView extends GLSurfaceView
 	float lightOffset = -4;
 	private float mPreviousY;//�ϴεĴ���λ��Y����
     private float mPreviousX;//�ϴεĴ���λ��X����
+	@SuppressLint("NewApi")
 	public MySurfaceView(Context context) {
         super(context);
         this.setEGLContextClientVersion(3); //����ʹ��OPENGL ES3.0
@@ -24,7 +24,7 @@ class MySurfaceView extends GLSurfaceView
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//������ȾģʽΪ������Ⱦ   
     }
 	//�����¼��ص�����
-    @Override 
+    @SuppressLint("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent e) {
         float y = e.getY();
         float x = e.getX();
@@ -39,37 +39,33 @@ class MySurfaceView extends GLSurfaceView
         mPreviousX = x;//��¼���ر�λ��
         return true;
     }
-	@SuppressLint("NewApi")
 	private class SceneRenderer implements Renderer
     {
-        public void onDrawFrame(GL10 gl) 
-        {
-//        	//�����Ȼ�������ɫ����
-//            GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
-//            //�����ֳ�
-//            MatrixState.pushMatrix();
-//            //������
-//            MatrixState.pushMatrix();
-//            ball.drawSelf();
-//            MatrixState.popMatrix();
-//            //�ָ��ֳ�
-//            MatrixState.popMatrix();
-
-            //�����Ȼ�������ɫ����
+        public void onDrawFrame(GL10 gl)
+        { 
+        	//�����Ȼ�������ɫ����
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
-//            MatrixState.setLightLocation(lightOffset, 0, 1.5f);
-            MatrixState.pushMatrix(); //�����ֳ�MatrixState.pushMatrix();//�����ֳ�
-            MatrixState.translate(-1.2f, 0, 0);//��x�Ḻ����ƽ��
-            ball.drawSelf();    //������
-            MatrixState.popMatrix();       //�ָ��ֳ�
+            //���ù�Դλ��
+            MatrixState.setLightLocation(lightOffset, 0, 1.5f);
+            //�����ֳ�
+            MatrixState.pushMatrix(); 
+            //������
+            MatrixState.pushMatrix();
+            MatrixState.translate(-1.2f, 0, 0);
+            
+            ball.drawSelf();    
+            MatrixState.popMatrix();       
+            //������
+            MatrixState.pushMatrix();
+            MatrixState.translate(1.2f, 0, 0);
+            ball.drawSelf();    
+            MatrixState.popMatrix();       
+            //�ָ��ֳ�
+            MatrixState.popMatrix();
+        }  
 
-            MatrixState.pushMatrix();//�����ֳ�
-            MatrixState.translate(1.2f, 0, 0);//��x��������ƽ��
-            ball.drawSelf();    //������
-            MatrixState.popMatrix();     //�ָ��ֳ�
-        }
-
-        public void onSurfaceChanged(GL10 gl, int width, int height) {
+        @SuppressLint("NewApi")
+		public void onSurfaceChanged(GL10 gl, int width, int height) {
             //�����Ӵ���С��λ��
         	GLES30.glViewport(0, 0, width, height);
         	//����GLSurfaceView�Ŀ�߱�
@@ -83,7 +79,7 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.setInitStack();
         }
 
-        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             //������Ļ����ɫRGBA
             GLES30.glClearColor(0f,0f,0f, 1.0f);  
             //���������
@@ -94,4 +90,7 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glEnable(GLES30.GL_CULL_FACE);
         }
     }
+	public void setLightOffset(float lightOffset) {
+		this.lightOffset = lightOffset;
+	}
 }

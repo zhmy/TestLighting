@@ -1,5 +1,8 @@
 package com.future.newt.p6;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 import android.opengl.Matrix;
 
 //�洢ϵͳ����״̬����
@@ -8,7 +11,8 @@ public class MatrixState
 	private static float[] mProjMatrix = new float[16];//4x4���� ͶӰ��
     private static float[] mVMatrix = new float[16];//�����λ�ó���9��������   
     private static float[] currMatrix;//��ǰ�任����
-      
+    public static float[] lightLocation=new float[]{0,0,0};//��Դλ������
+    public static FloatBuffer lightPositionFB;
     //�����任�����ջ
     static float[][] mStack=new float[10][16];
     static int stackTop=-1;
@@ -121,5 +125,20 @@ public class MatrixState
     public static float[] getMMatrix()
     {       
         return currMatrix;
+    }
+    //���õƹ�λ�õķ���
+    static ByteBuffer llbbL = ByteBuffer.allocateDirect(3*4);
+    public static void setLightLocation(float x,float y,float z)
+    {
+    	llbbL.clear();
+    	
+    	lightLocation[0]=x;
+    	lightLocation[1]=y;
+    	lightLocation[2]=z;
+    	
+        llbbL.order(ByteOrder.nativeOrder());//�����ֽ�˳��
+        lightPositionFB=llbbL.asFloatBuffer();
+        lightPositionFB.put(lightLocation);
+        lightPositionFB.position(0);
     }
 }
